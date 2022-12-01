@@ -17,8 +17,8 @@ fn main() {
 fn calories_per_elf(data: String) -> Vec<i32> {
     let mut result = Vec::new();
     let mut current_cals = 0;
-    for cal in data.split("\n") {
-        if cal != "" {
+    for cal in data.split('\n') {
+        if !cal.is_empty() {
             let cal_val: i32 = cal.parse().unwrap();
             current_cals += cal_val;
         } else {

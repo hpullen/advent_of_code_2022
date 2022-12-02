@@ -34,4 +34,3 @@ func ReverseMap[K comparable, V comparable](input map[K]V) map[V]K {
 	}
 	return output
 }
-

@@ -7,7 +7,9 @@ import (
 
 func main() {
 	data := utils.GetInput()
-	partOne(data)
+	points, start, summit := loadPoints(data)
+	partOne(points, start, summit)
+	partTwo(points, summit)
 }
 
 type point struct {
@@ -18,10 +20,27 @@ type point struct {
 	visited bool
 }
 
-func partOne(data []string) {
-	// Load the map
+func partOne(points [][]*point, start *point, summit *point) {
+	steps := findSteps(points, start, summit)
+	fmt.Println("Part 1: ", steps)
+}
+
+func partTwo(points [][]*point, summit *point) {
+	starts := findPotentialStarts(points)
+	currentMin := 10000
+	for _, s := range starts {
+		resetPoints(points, summit)
+		score := findSteps(points, s, summit)
+		if score < currentMin {
+			currentMin = score
+		}
+	}
+	fmt.Println("Part 2: ", currentMin)
+}
+
+func loadPoints(data []string) ([][]*point, *point, *point) {
 	var points [][]*point
-	var current *point
+	var summit *point
 	var start *point
 	for ii, line := range data {
 		var pointLine []*point
@@ -33,16 +52,18 @@ func partOne(data []string) {
 			} else if c == 'E' {
 				newPoint.value = 'z'
 				newPoint.score = 0
-				current = &newPoint
+				summit = &newPoint
 			}
 			pointLine = append(pointLine, &newPoint)
 		}
 		points = append(points, pointLine)
 	}
+	return points, start, summit
+}
 
+func findSteps(points [][]*point, start *point, summit *point) int {
 	var priorityQueue []*point
-
-	// Loop until we reach the start
+	current := summit
 	for current != start {
 		current.visited = true
 
@@ -71,8 +92,46 @@ func partOne(data []string) {
 				}
 			}
 		}
+		if len(priorityQueue) == 0 {
+			// If we get here, there is no path between these points
+			return 10000
+		}
 		current = priorityQueue[0]
 		priorityQueue = priorityQueue[1:]
 	}
-	fmt.Println("Part 1: ", current.score)
+	return current.score
+}
+
+func findPotentialStarts(points [][]*point) []*point {
+	var starts []*point
+	minVal := 'a'
+	for _, p := range points[0] {
+		if p.value == minVal {
+			starts = append(starts, p)
+		}
+	}
+	for _, p := range points[len(points)-1] {
+		if p.value == minVal {
+			starts = append(starts, p)
+		}
+	}
+	for i := 1; i < len(points)-1; i++ {
+		if points[i][0].value == minVal {
+			starts = append(starts, points[i][0])
+		}
+		if points[i][len(points[0])-1].value == minVal {
+			starts = append(starts, points[i][len(points[0])-1])
+		}
+	}
+	return starts
+}
+
+func resetPoints(points [][]*point, summit *point) {
+	for _, line := range points {
+		for _, p := range line {
+			p.score = 10000
+			p.visited = false
+		}
+	}
+	points[summit.i][summit.j].score = 0
 }

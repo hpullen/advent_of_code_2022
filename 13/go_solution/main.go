@@ -75,7 +75,7 @@ func comparePair(p1, p2 string) int {
 	for i, p1Item := range p1Split {
 
 		if i >= len(p2Split) {
-			return False
+			return False // p2 ran out of items first = wrong order
 		}
 		p2Item := p2Split[i]
 
@@ -86,11 +86,11 @@ func comparePair(p1, p2 string) int {
 			p1Val, _ := strconv.Atoi(p1Item)
 			p2Val, _ := strconv.Atoi(p2Item)
 			if p1Val < p2Val {
-				return True
+				return True // p1 < p2 = right order
 			} else if p1Val > p2Val {
-				return False
+				return False // p1 > p2 = wrong order
 			} else {
-				continue
+				continue // Otherwise, continue to next item in list
 			}
 		}
 
@@ -107,9 +107,9 @@ func comparePair(p1, p2 string) int {
 	}
 
 	if len(p2Split) > len(p1Split) {
-		return True
+		return True // p1 ran out of items first = right order
 	} else {
-		return Equal
+		return Equal // Otherwise, we are done with this list
 	}
 }
 
